@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using ShopAssistant.Payments;
-using ShopAssistant.Payments.Repositories;
+using ShopAssistant.Invoices;
+using ShopAssistant.Invoices.Repositories;
 using ShopAssistant.Accounts;
 using ShopAssistant.Infrastructure.Repositories.Mocks;
 using System.Text;
@@ -11,6 +11,8 @@ Console.WriteLine("Hello, World!");
 var invoiceRepository = new InMemoryInvoiceRepository();
 var accountRepository = new InMemoryAccountRepository();
 var ledgerRepository = new InMemoryLedgerEntryRepository();
+var settlementRepository = new InMemorySettlementRepository();
+
 string exitOption = "7";
 var selectedOption = "2";
 var invoiceId = 1;
@@ -22,6 +24,7 @@ while (selectedOption != exitOption)
     Console.WriteLine("1. Capture Invoice Payment");
     Console.WriteLine("2. Display Ledger Entries");
     Console.WriteLine("4. Process Settlement");
+    Console.WriteLine("5. Show Account Balances");
     Console.WriteLine("7. Exit");
 
     selectedOption = Console.ReadLine();
@@ -39,6 +42,9 @@ while (selectedOption != exitOption)
             break;
         case "4":
             ReceiveSettlement();
+            break;
+        case "5":
+            ShowAccountBalances();
             break;
         case "7":
             Console.WriteLine("Exiting...");
@@ -85,9 +91,9 @@ void ShowLedgerEntries() {
         return;
     }
 
-    Console.WriteLine("\n ---------------------- Ledger Entries:  --------------------------- \n");
-    Console.WriteLine("Description".PadRight(40) + " | " + "DR".PadLeft(10) + " | " + "CR".PadLeft(10) + " | Account");
-    Console.WriteLine("".PadLeft(90, '-'));
+    Console.WriteLine("\n                ---------------------- Ledger Entries:  --------------------------- \n");
+    Console.WriteLine("Description".PadRight(40) + " | " + "DR".PadLeft(10) + " | " + "CR".PadLeft(10) + " |  Account");
+    Console.WriteLine("".PadLeft(100, '-'));
     var sb = new StringBuilder();
     foreach (var entry in ledgerEntries)
     {
@@ -96,8 +102,8 @@ void ShowLedgerEntries() {
             sb.AppendFormat("{0} |", subEntry.Description[..Math.Min(subEntry.Description.Length, 40)].PadRight(40));
             sb.AppendFormat("{0} |", subEntry.EntryType == TransactionType.Debit ? subEntry.Amount.ToString().PadLeft(11) : "".PadLeft(11));
             sb.AppendFormat(" {0} |", subEntry.EntryType == TransactionType.Credit ? subEntry.Amount.ToString().PadLeft(10) : "".PadLeft(10));
-            sb.AppendFormat(" #{0}: {1}\n", subEntry.AccountId, accounts.FirstOrDefault(a => a.Id == subEntry.AccountId)?.Name ?? "Unknown Account");
-            sb.AppendLine("".PadLeft(90, '-'));
+            sb.AppendFormat("  #{0}: {1}\n", subEntry.AccountId, accounts.FirstOrDefault(a => a.Id == subEntry.AccountId)?.Name ?? "Unknown Account");
+            sb.AppendLine("".PadLeft(100, '-'));
         }
 
         Console.Write(sb.ToString());
@@ -108,14 +114,45 @@ void ShowLedgerEntries() {
 
 void ReceiveSettlement()
 {
-    var receiveSettlementUseCase = new ReceiveSettlementUseCase(ledgerRepository, accountRepository);
-    receiveSettlementUseCase.Execute(new Settlement(300,
-        [
-            new("INV-001", 100,"NGN", DateTime.UtcNow),
-            new("INV-002", 200, "NGN", DateTime.UtcNow),             
-        ]));
+    var receiveSettlementUseCase = new ReceiveSettlementUseCase(ledgerRepository, accountRepository, invoiceRepository, settlementRepository);
+
+    try
+    {
+        receiveSettlementUseCase.Execute(new Settlement(300, [.. invoiceRepository.GetAll().Select(i => new PaymentReference(i.Id, i.Amount.Value, i.Amount.Currency, DateTime.UtcNow))]));
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Settlement Error: {ex.Message}");
+        return;
+    }
 
     Console.WriteLine("Settlement Completed");
+}
+
+void ShowAccountBalances()
+{
+    var accounts = accountRepository.GetAll();
+    Console.WriteLine("\n ---------------------- Account Balances:  --------------------------- \n");
+
+    foreach (var account in accounts)
+    {
+        Console.WriteLine("".PadLeft(100, '-'));
+
+        Console.WriteLine($"Account No: #{account.Id.PadRight(10)} Account: {account.Name}");
+        var ledgerEntries = ledgerRepository.GetAll().Where(e => e.Entries.Any(entry => entry.AccountId == account.Id)).ToList();
+        decimal balance = 0;
+        foreach (var entry in ledgerEntries)
+        {
+            foreach (var subEntry in entry.Entries)
+            {
+                if (subEntry.AccountId == account.Id)
+                {
+                    balance += subEntry.EntryType == TransactionType.Debit ? subEntry.Amount : -subEntry.Amount;
+                }
+            }
+        }
+        Console.WriteLine($"Balance: {balance}");
+    }
 }
 
 void CapturePayments()

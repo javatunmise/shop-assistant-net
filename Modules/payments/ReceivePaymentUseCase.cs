@@ -1,6 +1,6 @@
 using ShopAssistant.Accounts;
 using ShopAssistant.Accounts.Repositories;
-using ShopAssistant.Payments.Repositories;
+using ShopAssistant.Invoices.Repositories;
 internal class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository, 
                                             IAccountRepository accountRepository,
                                             ILedgerEntryRepository ledgerEntryRepository)
@@ -12,17 +12,22 @@ internal class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository
     public void Execute(string invoiceId, decimal amount)
     {
         //find invoice by id 
-        var invoice = _invoiceRepository.GetById(invoiceId);
+        var invoice = _invoiceRepository.GetById(invoiceId) ?? throw new Exception($"Invoice with id {invoiceId} not found");
+
         //check if amount is not greater than invoice amount
         if (amount != invoice.Amount.Value)
         {
             throw new Exception("Amount is not equal to invoice amount");
         }
 
+        if(invoice.IsPaid)
+        {
+            throw new Exception($"Invoice with id {invoiceId} has already been paid");
+        }
+
         var paymentDescription = $"Payment for invoice {invoiceId}";
         var receivableAccount = _accountRepository.GetByName("POS Receivables Account");
         var revenueAccount = _accountRepository.GetByName("Sales Revenue Account");
-
 
         var ledgerEntry = new LedgerEntryBuilder()
             .Document(invoiceId, "Invoice")
@@ -33,9 +38,4 @@ internal class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository
 
         _ledgerEntryRepository.Add(ledgerEntry);
     }
-}
-
-public enum TransactionType
-{
-    Debit, Credit
 }

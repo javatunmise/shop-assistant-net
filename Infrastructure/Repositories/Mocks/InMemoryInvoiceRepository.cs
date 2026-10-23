@@ -1,8 +1,9 @@
 
 namespace ShopAssistant.Infrastructure.Repositories.Mocks;
 
-using ShopAssistant.Payments.Repositories;
-using ShopAssistant.Payments;
+using ShopAssistant.Invoices.Repositories;
+using ShopAssistant.Invoices;
+
 internal class InMemoryInvoiceRepository : IInvoiceRepository
 {
     private readonly Dictionary<string, Invoice> _invoices = [];
@@ -19,5 +20,10 @@ internal class InMemoryInvoiceRepository : IInvoiceRepository
     public void Add(Invoice invoice)
     {
         _invoices[invoice.Id] = invoice;
+    }
+
+    public IEnumerable<Invoice> GetAll()
+    {
+        return _invoices.Values;
     }
 }

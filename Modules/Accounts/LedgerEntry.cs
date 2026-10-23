@@ -83,3 +83,8 @@ class LedgerEntryBuilder
         public required string AccountId { get; set; }
     }
 }
+
+public enum TransactionType
+{
+    Debit, Credit
+}
