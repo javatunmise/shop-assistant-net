@@ -4,7 +4,7 @@ namespace ShopAssistant.Infrastructure.Repositories.Mocks;
 using ShopAssistant.Invoices.Repositories;
 using ShopAssistant.Invoices;
 
-internal class InMemoryInvoiceRepository : IInvoiceRepository
+public class InMemoryInvoiceRepository : IInvoiceRepository
 {
     private readonly Dictionary<string, Invoice> _invoices = [];
 

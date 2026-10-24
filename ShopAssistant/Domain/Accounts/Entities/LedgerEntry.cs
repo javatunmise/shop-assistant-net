@@ -1,6 +1,6 @@
 
 namespace ShopAssistant.Accounts;
-class LedgerEntryBuilder 
+public class LedgerEntryBuilder 
 {
     private readonly List<LedgerEntryItem> entries = [];
 
@@ -74,7 +74,7 @@ class LedgerEntryBuilder
         }
     }
 
-    internal class LedgerEntryItem
+    public class LedgerEntryItem
     {
         public required string Description { get; init; }
         public decimal Amount { get; init; }

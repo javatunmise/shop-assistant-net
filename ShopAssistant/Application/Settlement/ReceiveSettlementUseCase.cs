@@ -1,8 +1,9 @@
 using ShopAssistant.Accounts;
 using ShopAssistant.Accounts.Repositories;
 using ShopAssistant.Invoices.Repositories;
+using ShopAssistant.Settlement.Repositories;
 
-internal class ReceiveSettlementUseCase(ILedgerEntryRepository ledgerEntryRepository, IAccountRepository accountRepository, IInvoiceRepository invoiceRepository, ISettlementRepository settlementRepository)
+public class ReceiveSettlementUseCase(ILedgerEntryRepository ledgerEntryRepository, IAccountRepository accountRepository, IInvoiceRepository invoiceRepository, ISettlementRepository settlementRepository)
 {
     private readonly ILedgerEntryRepository _ledgerEntryRepository = ledgerEntryRepository;
     private readonly IAccountRepository _accountRepository = accountRepository;

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/ShopAssistantConsole/">
+    <Project Path="ShopAssistantConsole/ShopAssistant.Console.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/ShopAssistant.Tests/ShopAssistant.Tests.csproj" />
+  </Folder>
+  <Project Path="ShopAssistant/ShopAssistant.csproj" />
+</Solution>

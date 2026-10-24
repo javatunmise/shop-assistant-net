@@ -1,5 +1,5 @@
 namespace ShopAssistant.Invoices.Repositories;
-internal interface IInvoiceRepository
+public interface IInvoiceRepository
 {
     Invoice GetById(string id);
     void Add(Invoice invoice);

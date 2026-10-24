@@ -1,6 +1,8 @@
+using ShopAssistant.Settlement.Repositories;
+
 namespace ShopAssistant.Infrastructure.Repositories.Mocks;
 
-internal class InMemorySettlementRepository : ISettlementRepository
+public class InMemorySettlementRepository : ISettlementRepository
 {
     private readonly Dictionary<string, PaymentReference> _paymentReferences = [];
 

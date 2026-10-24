@@ -1,7 +1,7 @@
 using ShopAssistant.Accounts;
 using ShopAssistant.Accounts.Repositories;
 using ShopAssistant.Invoices.Repositories;
-internal class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository, 
+public class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository, 
                                             IAccountRepository accountRepository,
                                             ILedgerEntryRepository ledgerEntryRepository)
 {

@@ -1,7 +1,7 @@
 using ShopAssistant.Accounts;
 using ShopAssistant.Accounts.Repositories;
-using ShopAssistant.Payments;
-using ShopAssistant.Payments.Repositories;
+using ShopAssistant.Invoices;
+using ShopAssistant.Invoices.Repositories;
 using Xunit;
 
 public class ReceivePaymentFromPOSUseCaseTests
@@ -83,6 +83,8 @@ public class ReceivePaymentFromPOSUseCaseTests
         }
 
         public void Add(Invoice invoice) => throw new NotSupportedException();
+
+        public IEnumerable<Invoice> GetAll() => [invoice];
     }
 
     private sealed class FakeAccountRepository : IAccountRepository
