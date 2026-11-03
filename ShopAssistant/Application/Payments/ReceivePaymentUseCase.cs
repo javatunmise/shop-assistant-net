@@ -1,4 +1,6 @@
-using ShopAssistant.Accounts;
+namespace ShopAssistant.Application.Payments;
+
+using ShopAssistant.Accounts.Entities;
 using ShopAssistant.Accounts.Repositories;
 using ShopAssistant.Invoices.Repositories;
 public class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository, 

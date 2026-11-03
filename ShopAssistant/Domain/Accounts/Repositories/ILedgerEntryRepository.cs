@@ -1,9 +1,9 @@
 namespace ShopAssistant.Accounts.Repositories;
 
-using ShopAssistant.Accounts;
+using ShopAssistant.Accounts.Entities;
 
 public interface ILedgerEntryRepository
 {
-    void Add(LedgerEntryBuilder.LedgerEntry ledgerEntry);
-    IEnumerable<LedgerEntryBuilder.LedgerEntry> GetAll();
+    void Add(LedgerEntry ledgerEntry);
+    IEnumerable<LedgerEntry> GetAll();
 }

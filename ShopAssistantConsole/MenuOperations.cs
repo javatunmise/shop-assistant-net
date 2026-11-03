@@ -1,11 +1,14 @@
 // See https://aka.ms/new-console-template for more information
 using ShopAssistant.Invoices;
-using ShopAssistant.Accounts;
+using ShopAssistant.Accounts.Entities;
 using System.Text;
 using ShopAssistant.Accounts.Repositories;
 using ShopAssistant.Invoices.Repositories;
 using ShopAssistant.Settlement.Repositories;
 using ShopAssistant.Infrastructure.Repositories.Mocks;
+using ShopAssistant.Application.Payments;
+using ShopAssistant.Settlement.Entities;
+using ShopAssistant.Application.Settlement;
 
 internal class MenuOperations
 {
@@ -14,12 +17,13 @@ internal class MenuOperations
     private readonly IInvoiceRepository invoiceRepository = new InMemoryInvoiceRepository();
     private readonly IAccountRepository accountRepository = new InMemoryAccountRepository();
     private readonly ILedgerEntryRepository ledgerRepository = new InMemoryLedgerEntryRepository();
-    private readonly ISettlementRepository settlementRepository = new InMemorySettlementRepository();
+    private readonly ISettlementRepository settlementRepository;
     private readonly IEnumerable<Account> accounts = [];
 
     public MenuOperations()
     {
         accounts = accountRepository.GetAll();
+        settlementRepository = new InMemorySettlementRepository(invoiceRepository, ledgerRepository);
     }
 
     public void DisplaySystemState()
@@ -44,7 +48,7 @@ internal class MenuOperations
 
             foreach (var subEntry in entry.Entries)
             {
-                Console.WriteLine($"  Sub Entry: Description: {subEntry.Description}, Type: {subEntry.EntryType},  Amount: {entry.Amount.Currency} {subEntry.Amount}");
+                Console.WriteLine($"  Sub Entry: Description: {subEntry.Description}, Type: {subEntry.EntryType},  Amount: {entry.Amount.Currency} {subEntry.Amount.Value}, Account: #{subEntry.AccountId} - {accounts.FirstOrDefault(a => a.Id == subEntry.AccountId)?.Name ?? "Unknown Account"}");
             }
         }
     }
@@ -68,8 +72,8 @@ internal class MenuOperations
             foreach (var subEntry in entry.Entries)
             {
                 sb.AppendFormat("{0} |", subEntry.Description[..Math.Min(subEntry.Description.Length, 40)].PadRight(40));
-                sb.AppendFormat("{0} |", subEntry.EntryType == TransactionType.Debit ? subEntry.Amount.ToString().PadLeft(11) : "".PadLeft(11));
-                sb.AppendFormat(" {0} |", subEntry.EntryType == TransactionType.Credit ? subEntry.Amount.ToString().PadLeft(10) : "".PadLeft(10));
+                sb.AppendFormat("{0} |", subEntry.EntryType == TransactionType.Debit ? subEntry.Amount.Value.ToString().PadLeft(11) : "".PadLeft(11));
+                sb.AppendFormat(" {0} |", subEntry.EntryType == TransactionType.Credit ? subEntry.Amount.Value.ToString().PadLeft(10) : "".PadLeft(10));
                 sb.AppendFormat("  #{0}: {1}\n", subEntry.AccountId, accounts.FirstOrDefault(a => a.Id == subEntry.AccountId)?.Name ?? "Unknown Account");
                 sb.AppendLine("".PadLeft(100, '-'));
             }
@@ -115,7 +119,7 @@ internal class MenuOperations
                 {
                     if (subEntry.AccountId == account.Id)
                     {
-                        balance += subEntry.EntryType == TransactionType.Debit ? subEntry.Amount : -subEntry.Amount;
+                        balance += subEntry.EntryType == TransactionType.Debit ? subEntry.Amount.Value : -subEntry.Amount.Value;
                     }
                 }
             }
@@ -150,7 +154,7 @@ internal class MenuOperations
         var invoice = new Invoice
         {
             Description = $"Invoice for {item.Item1}",
-            Amount = new Money(item.Item2) { Currency = "NGN" },
+            Amount = new Money(item.Item2, "NGN"),
             Id = $"INV-{invoiceId.ToString("000")}"
         };
 

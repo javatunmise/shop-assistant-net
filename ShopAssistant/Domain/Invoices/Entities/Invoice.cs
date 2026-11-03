@@ -1,4 +1,4 @@
-using ShopAssistant.Accounts;
+using ShopAssistant.Accounts.Entities;
 
 namespace ShopAssistant.Invoices;
 public class Invoice

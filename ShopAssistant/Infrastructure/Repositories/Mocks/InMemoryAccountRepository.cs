@@ -1,7 +1,7 @@
 namespace ShopAssistant.Infrastructure.Repositories.Mocks;
 
 using ShopAssistant.Accounts.Repositories;
-using ShopAssistant.Accounts;
+using ShopAssistant.Accounts.Entities;
 public class InMemoryAccountRepository : IAccountRepository
 {
     private readonly Dictionary<string, Account> _accounts = [];

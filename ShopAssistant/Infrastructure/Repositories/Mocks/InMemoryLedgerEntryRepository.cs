@@ -1,8 +1,7 @@
 namespace ShopAssistant.Infrastructure.Repositories.Mocks;
 
-using ShopAssistant.Accounts;
+using ShopAssistant.Accounts.Entities;
 using ShopAssistant.Accounts.Repositories;
-using static ShopAssistant.Accounts.LedgerEntryBuilder;
 
 public class InMemoryLedgerEntryRepository : ILedgerEntryRepository
 {

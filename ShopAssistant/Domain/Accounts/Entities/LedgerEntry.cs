@@ -1,89 +1,28 @@
 
-namespace ShopAssistant.Accounts;
-public class LedgerEntryBuilder 
+namespace ShopAssistant.Accounts.Entities;
+
+public class LedgerEntry
 {
-    private readonly List<LedgerEntryItem> entries = [];
-
-    private string DocumentId = "";
-    private string DocumentType = "";
-    private string _currency = "";
-
-    public LedgerEntryBuilder Document(string documentId, string documentType)
+    public List<LedgerEntryItem> Entries { get; init; } = [];
+    public required string DocumentId { get; init; }
+    public required string DocumentType { get; init; }
+    public Money Amount { get; set; }
+    public LedgerEntry(List<LedgerEntryItem> entries, string currency)
     {
-        DocumentId = documentId;
-        DocumentType = documentType;
-        return this;
-    }
-    public LedgerEntryBuilder Credit(string accountId, decimal amount, string description = "")
-    {
-        AddLedgerEntry(new LedgerEntryItem { 
-                            Amount = amount, 
-                            EntryType = TransactionType.Credit,
-                            Description = $"{description}" ,
-                            AccountId = accountId
-                        });
-        return this;
-    }
+        ArgumentNullException.ThrowIfNull(entries, nameof(entries));
+        if (entries.Count == 0)
+            throw new InvalidOperationException("A ledger entry must contain at least one debit and one credit.");
 
-    public LedgerEntryBuilder Debit(string accountId, decimal amount, string description = "")
-    {
-        AddLedgerEntry(new LedgerEntryItem { 
-                            Amount = amount, 
-                            EntryType = TransactionType.Debit,
-                            Description = $"{description}",
-                            AccountId = accountId
-                         });
-        return this;
-    }
-
-    private void AddLedgerEntry(LedgerEntryItem ledgerEntryItem)
-    {
-        entries.Add(ledgerEntryItem);
-    }
-
-    internal LedgerEntry Build()
-    {
-        var debit = entries.Where(e => e.EntryType == TransactionType.Debit).Sum(e => e.Amount);
-        var credit =  entries.Where(e => e.EntryType == TransactionType.Credit).Sum(e => e.Amount);
+        var debit = entries.Where(e => e.EntryType == TransactionType.Debit).Sum(e => e.Amount.Value);
+        var credit =  entries.Where(e => e.EntryType == TransactionType.Credit).Sum(e => e.Amount.Value);
         if(debit - credit != 0)
             throw new ArgumentException("Account entries should balance to zero");
 
-        return new LedgerEntry(entries, _currency) {
-            DocumentId = this.DocumentId,
-            DocumentType = this.DocumentType
-        };
-    }
 
-    internal LedgerEntryBuilder Currency(string currency)
-    {
-        _currency = currency;
-        return this;
-    }
-
-    public class LedgerEntry 
-    {
-        public List<LedgerEntryItem> Entries { get; init; } = [];
-        public required string DocumentId { get; init; }
-        public required string DocumentType { get; init; }
-        public Money Amount { get; set; } 
-        public LedgerEntry(List<LedgerEntryItem> entries, string currency)
-        {
-            ArgumentNullException.ThrowIfNull(entries, nameof(entries));
-            Entries = entries;
-            Amount = new Money(entries.Where(e => e.EntryType == TransactionType.Debit).Sum(e => e.Amount)) { Currency = currency };
-        }
-    }
-
-    public class LedgerEntryItem
-    {
-        public required string Description { get; init; }
-        public decimal Amount { get; init; }
-        public TransactionType EntryType { get; init; }
-        public DateTime Timestamp { get; init; } = DateTime.UtcNow;
-        public required string AccountId { get; set; }
+        Entries = entries;
+        Amount = new Money(entries.Where(e => e.EntryType == TransactionType.Debit).Sum(e => e.Amount.Value), currency);
     }
 }
-
 public enum TransactionType
 {
     Debit, Credit

@@ -1,4 +1,4 @@
-namespace ShopAssistant.Accounts;
+namespace ShopAssistant.Accounts.Entities;
 
 public class Account
 {
@@ -6,7 +6,6 @@ public class Account
     public required string Name { get; set; }
 }
 
-public record Money(decimal Value)
+public record Money(decimal Value, string Currency)
 {
-    public required string Currency { get; init; }
 }

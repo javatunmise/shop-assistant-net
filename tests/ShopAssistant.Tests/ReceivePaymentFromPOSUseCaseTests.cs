@@ -1,5 +1,6 @@
-using ShopAssistant.Accounts;
+using ShopAssistant.Accounts.Entities;
 using ShopAssistant.Accounts.Repositories;
+using ShopAssistant.Application.Payments;
 using ShopAssistant.Invoices;
 using ShopAssistant.Invoices.Repositories;
 using Xunit;
@@ -25,20 +26,20 @@ public class ReceivePaymentFromPOSUseCaseTests
         Assert.Equal(InvoiceId, invoiceRepository.RequestedId);
         Assert.Equal(InvoiceId, ledgerEntry.DocumentId);
         Assert.Equal("Invoice", ledgerEntry.DocumentType);
-        Assert.Equal(new Money(100m) { Currency = "NGN" }, ledgerEntry.Amount);
+        Assert.Equal(new Money(100m, "NGN"), ledgerEntry.Amount);
 
         Assert.Collection(
             ledgerEntry.Entries,
             debit =>
             {
                 Assert.Equal(TransactionType.Debit, debit.EntryType);
-                Assert.Equal(100m, debit.Amount);
+                Assert.Equal(100m, debit.Amount.Value);
                 Assert.Contains("2", debit.Description);
             },
             credit =>
             {
                 Assert.Equal(TransactionType.Credit, credit.EntryType);
-                Assert.Equal(100m, credit.Amount);
+                Assert.Equal(100m, credit.Amount.Value);
                 Assert.Contains("1", credit.Description);
             });
 
@@ -69,7 +70,7 @@ public class ReceivePaymentFromPOSUseCaseTests
         new()
         {
             Id = InvoiceId,
-            Amount = new Money(amount) { Currency = "NGN" }
+            Amount = new Money(amount, "NGN")
         };
 
     private sealed class FakeInvoiceRepository(Invoice invoice) : IInvoiceRepository
@@ -97,6 +98,11 @@ public class ReceivePaymentFromPOSUseCaseTests
 
         public List<string> RequestedNames { get; } = [];
 
+        public IEnumerable<Account> GetAll()
+        {
+            return Accounts.Values;
+        }
+
         public Account GetByName(string name)
         {
             RequestedNames.Add(name);
@@ -106,10 +112,10 @@ public class ReceivePaymentFromPOSUseCaseTests
 
     private sealed class FakeLedgerEntryRepository : ILedgerEntryRepository
     {
-        public List<LedgerEntryBuilder.LedgerEntry> Entries { get; } = [];
+        public List<LedgerEntry> Entries { get; } = [];
 
-        public void Add(LedgerEntryBuilder.LedgerEntry ledgerEntry) => Entries.Add(ledgerEntry);
+        public void Add(LedgerEntry ledgerEntry) => Entries.Add(ledgerEntry);
 
-        public IEnumerable<LedgerEntryBuilder.LedgerEntry> GetAll() => Entries;
+        public IEnumerable<LedgerEntry> GetAll() => Entries;
     }
 }

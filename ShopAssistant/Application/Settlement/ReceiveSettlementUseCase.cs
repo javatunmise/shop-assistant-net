@@ -1,7 +1,9 @@
-using ShopAssistant.Accounts;
+namespace ShopAssistant.Application.Settlement;
+
 using ShopAssistant.Accounts.Repositories;
 using ShopAssistant.Invoices.Repositories;
 using ShopAssistant.Settlement.Repositories;
+using ShopAssistant.Settlement.Entities;
 
 public class ReceiveSettlementUseCase(ILedgerEntryRepository ledgerEntryRepository, IAccountRepository accountRepository, IInvoiceRepository invoiceRepository, ISettlementRepository settlementRepository)
 {
@@ -11,7 +13,7 @@ public class ReceiveSettlementUseCase(ILedgerEntryRepository ledgerEntryReposito
     private readonly ISettlementRepository _settlementRepository = settlementRepository;
     public void Execute(Settlement settlement)
     {
-        var cashAccount = _accountRepository.GetByName("Cash"); 
+        var cashAccount = _accountRepository.GetByName("Cash");
         var posReceivablesAccount = _accountRepository.GetByName("POS Receivables Account"); // Replace with actual receivables account ID
 
         foreach (var payment in settlement.References)
@@ -19,27 +21,13 @@ public class ReceiveSettlementUseCase(ILedgerEntryRepository ledgerEntryReposito
             var existingPayment = _settlementRepository.GetByRef(payment.Reference);
             if (existingPayment != null)
             {
-                throw new Exception($"Payment reference {payment.Reference} has already been settled.");
+                continue; // Skip already settled payments
             }
-            
+
             var invoice = _invoiceRepository.GetById(payment.Reference) ?? throw new Exception($"Invoice with id {payment.Reference} not found");
-            if (payment.Amount != invoice.Amount.Value)
-            {
-                throw new Exception($"Payment amount {payment.Amount} does not match invoice amount {invoice.Amount.Value} for invoice {payment.Reference}");
-            }
+            var processedSettlement = new ProcessedSettlement(cashAccount, posReceivablesAccount, payment, invoice);           
 
-            if(invoice.IsPaid) continue; // Skip already paid invoices
-
-            _settlementRepository.Add(new PaymentReference(payment.Reference, payment.Amount, "", DateTime.UtcNow)); // Mark invoice as settled
-
-            var ledgerEntry = new LedgerEntryBuilder()
-                .Document(payment.Reference, "Settlement")
-                .Currency(payment.Currency) // Assuming USD for simplicity; adjust as needed
-                .Debit(cashAccount.Id, payment.Amount, $"Settlememt: Payment reference: {payment.Reference}")
-                .Credit(posReceivablesAccount.Id, payment.Amount, $"Settlememt: Payment reference: {payment.Reference}")
-                .Build();
-
-            _ledgerEntryRepository.Add(ledgerEntry);           
+            _settlementRepository.Save(processedSettlement);
         }
     }
 }
