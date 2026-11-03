@@ -36,9 +36,9 @@ public class InMemorySettlementRepository : ISettlementRepository
     public void Save(ProcessedSettlement processedSettlement)
     {
         //TransactionScope transactionScope = new TransactionScope();
-        _paymentReferences[processedSettlement.PaymentReference.Reference] = processedSettlement.PaymentReference;
+        //_paymentReferences[processedSettlement.PaymentReference.Reference] = processedSettlement.PaymentReference;
         //_invoiceRepository.Update(processedSettlement.Invoice);
-        _ledgerEntryRepository.Add(processedSettlement.LedgerEntry);
+        //_ledgerEntryRepository.Add(processedSettlement.LedgerEntry);
         //transactionScope.Complete();
     }
 }

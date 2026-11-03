@@ -86,6 +86,11 @@ public class ReceivePaymentFromPOSUseCaseTests
         public void Add(Invoice invoice) => throw new NotSupportedException();
 
         public IEnumerable<Invoice> GetAll() => [invoice];
+
+        public void Update(Invoice invoice)
+        {
+            
+        }
     }
 
     private sealed class FakeAccountRepository : IAccountRepository

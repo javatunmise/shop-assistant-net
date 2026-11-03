@@ -90,7 +90,7 @@ internal class MenuOperations
 
         try
         {
-            receiveSettlementUseCase.Execute(new Settlement(300, [.. invoiceRepository.GetAll().Select(i => new PaymentReference(i.Id, i.Amount.Value, i.Amount.Currency, DateTime.UtcNow))]));
+            receiveSettlementUseCase.Execute(new SettlementBatch(300, [.. invoiceRepository.GetAll().Select(i => new PaymentReference(i.Id, i.Amount.Value, i.Amount.Currency, DateTime.UtcNow))]));
         }
         catch (Exception ex)
         {

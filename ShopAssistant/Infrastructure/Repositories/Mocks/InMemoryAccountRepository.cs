@@ -10,7 +10,7 @@ public class InMemoryAccountRepository : IAccountRepository
     {
         _accounts["POS Receivables Account"] = new Account { Id = "1", Name = "POS Receivables Account" };
         _accounts["Sales Revenue Account"] = new Account { Id = "2", Name = "Sales Revenue Account" };
-        _accounts["Cash"] = new Account { Id = "3", Name = "Cash / Bank" };
+        _accounts["Cash"] = new Account { Id = "3", Name = "Cash" };
     }
 
     public IEnumerable<Account> GetAll()

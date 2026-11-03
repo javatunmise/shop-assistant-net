@@ -6,5 +6,10 @@ public class Invoice
     public required string Id { get; init; }
     public required Money Amount { get; init; }
     public string Description { get; set; } = "";
-    public bool IsPaid { get; set; } = false;
+    public bool IsPaid { get; private set; } = false;
+
+    public void MarkAsPaid()
+    {
+        IsPaid = true;
+    }
 }

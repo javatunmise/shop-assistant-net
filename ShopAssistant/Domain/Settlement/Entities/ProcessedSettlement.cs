@@ -3,24 +3,8 @@ namespace ShopAssistant.Settlement.Entities;
 using ShopAssistant.Accounts.Entities;
 using ShopAssistant.Settlement.Entities;
 
-public class ProcessedSettlement
+public class ProcessedSettlement(PaymentReference payment, Invoices.Invoice invoice)
 {
-    public LedgerEntry LedgerEntry { get; private set; }
-    public PaymentReference PaymentReference { get; private set; }
-    public Invoices.Invoice Invoice { get; private set; }
-
-    public ProcessedSettlement(Account cashAccount, Account posReceivablesAccount, PaymentReference payment, Invoices.Invoice invoice)
-    {
-       
-        Invoice = invoice;
-
-        PaymentReference = new PaymentReference(payment.Reference, payment.Amount, "", DateTime.UtcNow); // Mark invoice as settled
-
-        LedgerEntry = new LedgerEntryBuilder()
-            .Document(payment.Reference, "Settlement")
-            .Currency(payment.Currency) // Assuming USD for simplicity; adjust as needed
-            .Debit(cashAccount.Id, payment.Amount, $"Settlememt: Payment reference: {payment.Reference}")
-            .Credit(posReceivablesAccount.Id, payment.Amount, $"Settlememt: Payment reference: {payment.Reference}")
-            .Build();
-    }
+    public PaymentReference PaymentReference { get; private set; } = new PaymentReference(payment.Reference, payment.Amount, "NGN", DateTime.UtcNow, "Completed"); // Mark invoice as settled
+    public Invoices.Invoice Invoice { get; private set; } = invoice;
 }

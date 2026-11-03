@@ -1,5 +1,6 @@
 namespace ShopAssistant.Application.Payments;
 
+using System.Transactions;
 using ShopAssistant.Accounts.Entities;
 using ShopAssistant.Accounts.Repositories;
 using ShopAssistant.Invoices.Repositories;
@@ -38,6 +39,14 @@ public class ReceivePaymentFromPOSUseCase(IInvoiceRepository invoiceRepository,
             .Debit(receivableAccount.Id, amount, $"{receivableAccount.Name[..1]}: {paymentDescription}")
             .Build();
 
+        using var transaction = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
+
         _ledgerEntryRepository.Add(ledgerEntry);
+
+        invoice.MarkAsPaid();
+
+        _invoiceRepository.Update(invoice);
+
+        transaction.Complete();
     }
 }

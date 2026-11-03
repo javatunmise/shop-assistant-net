@@ -27,4 +27,16 @@ public class InMemoryInvoiceRepository : IInvoiceRepository
     {
         return _invoices.Values;
     }
+
+    public void Update(Invoice invoice)
+    {
+        if (_invoices.ContainsKey(invoice.Id))
+        {
+            _invoices[invoice.Id] = invoice;
+        }
+        else
+        {
+            throw new Exception($"Invoice with id {invoice.Id} not found");
+        }
+    }
 }
