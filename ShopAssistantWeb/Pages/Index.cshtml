@@ -1,0 +1,103 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard Portal";
+}
+
+<div class="py-4">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold mb-1">ShopAssistant Web Portal</h1>
+            <p class="text-secondary lead mb-0">Unified Point of Sale, Invoice Payment, and General Ledger Settlement System</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="badge bg-success px-3 py-2 fs-6">System Online</span>
+        </div>
+    </div>
+
+    <!-- Quick Role Selection Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm border-start border-primary border-4">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary me-3 fs-3">
+                            &#128179;
+                        </div>
+                        <div>
+                            <h3 class="card-title h4 mb-0 fw-bold">Cashier Portal (POS)</h3>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Use Case 1: Receive Payment from POS</span>
+                        </div>
+                    </div>
+                    <p class="card-text text-secondary mb-4">
+                        Issue new customer invoices, select catalog items, and process real-time POS payments. Executes <code>ReceivePaymentFromPOSUseCase</code> to record revenue and debit POS receivables atomically.
+                    </p>
+                    <div class="mt-auto">
+                        <a asp-page="/Cashier/Index" class="btn btn-primary btn-lg w-100 shadow-sm">
+                            Open Cashier Terminal &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm border-start border-success border-4">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success me-3 fs-3">
+                            &#128202;
+                        </div>
+                        <div>
+                            <h3 class="card-title h4 mb-0 fw-bold">Admin Portal (Settlement &amp; GL)</h3>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Use Case 2: Process Settlement Batch</span>
+                        </div>
+                    </div>
+                    <p class="card-text text-secondary mb-4">
+                        Monitor live account balances, inspect double-entry general ledger journals, and trigger batch settlements from payment processors into bank accounts via <code>ReceiveSettlementUseCase</code>.
+                    </p>
+                    <div class="mt-auto">
+                        <a asp-page="/Admin/Index" class="btn btn-success btn-lg w-100 shadow-sm">
+                            Open Admin Console &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Metrics Grid -->
+    <div class="row g-3">
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="text-secondary small fw-bold text-uppercase">Total Invoices</div>
+                <div class="display-6 fw-bold text-dark my-1">@Model.TotalInvoices</div>
+                <div class="small">
+                    <span class="text-success fw-bold">@Model.PaidInvoices Paid</span> &bull; 
+                    <span class="text-warning fw-bold">@Model.UnpaidInvoices Pending</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="text-secondary small fw-bold text-uppercase">Sales Revenue</div>
+                <div class="display-6 fw-bold text-success my-1">&#8358;@Model.RevenueBalance.ToString("N2")</div>
+                <div class="small text-secondary">Credit-normal balance</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="text-secondary small fw-bold text-uppercase">POS Receivables</div>
+                <div class="display-6 fw-bold text-primary my-1">&#8358;@Model.ReceivablesBalance.ToString("N2")</div>
+                <div class="small text-secondary">Unsettled processor funds</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="text-secondary small fw-bold text-uppercase">Cash / Bank Account</div>
+                <div class="display-6 fw-bold text-info my-1">&#8358;@Model.CashBalance.ToString("N2")</div>
+                <div class="small text-secondary">Settled bank liquidity</div>
+            </div>
+        </div>
+    </div>
+</div>
