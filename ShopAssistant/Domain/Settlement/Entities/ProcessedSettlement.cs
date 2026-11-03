@@ -1,4 +1,4 @@
-namespace ShopAssistant.Application.Settlement;
+namespace ShopAssistant.Settlement.Entities;
 
 using ShopAssistant.Accounts.Entities;
 using ShopAssistant.Settlement.Entities;
@@ -11,16 +11,7 @@ public class ProcessedSettlement
 
     public ProcessedSettlement(Account cashAccount, Account posReceivablesAccount, PaymentReference payment, Invoices.Invoice invoice)
     {
-        if (payment.Amount != invoice.Amount.Value)
-        {
-            throw new Exception($"Payment amount {payment.Amount} does not match invoice amount {invoice.Amount.Value} for invoice {payment.Reference}");
-        }
-
-        if (invoice.IsPaid)
-        {
-            throw new Exception($"Invoice with id {payment.Reference} has already been paid");
-        }
-
+       
         Invoice = invoice;
 
         PaymentReference = new PaymentReference(payment.Reference, payment.Amount, "", DateTime.UtcNow); // Mark invoice as settled

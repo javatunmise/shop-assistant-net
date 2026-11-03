@@ -25,9 +25,35 @@ public class ReceiveSettlementUseCase(ILedgerEntryRepository ledgerEntryReposito
             }
 
             var invoice = _invoiceRepository.GetById(payment.Reference) ?? throw new Exception($"Invoice with id {payment.Reference} not found");
+            if (payment.Amount != invoice.Amount.Value)
+            {
+                throw new Exception($"Payment amount {payment.Amount} does not match invoice amount {invoice.Amount.Value} for invoice {payment.Reference}");
+            }
+
+            if (invoice.IsPaid)
+            {
+                throw new Exception($"Invoice with id {payment.Reference} has already been paid");
+            }
+     
             var processedSettlement = new ProcessedSettlement(cashAccount, posReceivablesAccount, payment, invoice);           
 
             _settlementRepository.Save(processedSettlement);
         }
     }
+}
+
+class ProcessedSettlement2
+{
+    public string Status { get; private set; }
+    public ProcessedSettlement2(string batchId, string reference, string referenceType, decimal amount, DateTime date)
+    {
+        Status = "Pending";
+    }
+
+    public void MarkAsCompleted()
+    {
+        Status = "Completed";
+    }
+
+    public bool IsComplete => Status == "Completed";
 }

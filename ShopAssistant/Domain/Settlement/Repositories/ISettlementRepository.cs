@@ -1,6 +1,5 @@
 namespace ShopAssistant.Settlement.Repositories;
 
-using ShopAssistant.Application.Settlement;
 using ShopAssistant.Settlement.Entities;
 
 public interface ISettlementRepository
