@@ -3,59 +3,117 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ShopAssistant Web</title>
+    <title>@ViewData["Title"] - ShopAssistant</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/shopassistantweb.styles.css" asp-append-version="true" />
+    <style>
+        :root {
+            --sa-purple:       #6f42c1;
+            --sa-purple-dark:  #4b2d8f;
+            --sa-purple-light: #e9e3f8;
+            --sa-purple-muted: #9b72db;
+        }
+
+        body { background: #f5f3fb; font-size: 0.925rem; }
+
+        /* Navbar */
+        .sa-nav { background: var(--sa-purple-dark) !important; }
+        .sa-nav .navbar-brand { color: #fff !important; font-weight: 700; letter-spacing: .5px; }
+        .sa-nav .nav-link { color: rgba(255,255,255,.8) !important; }
+        .sa-nav .nav-link:hover,
+        .sa-nav .nav-link.active { color: #fff !important; }
+        .sa-nav .nav-link.active { border-bottom: 2px solid #fff; }
+
+        /* Purple utility overrides */
+        .btn-sa    { background: var(--sa-purple); color: #fff; border: none; }
+        .btn-sa:hover { background: var(--sa-purple-dark); color: #fff; }
+        .btn-sa-outline { border: 1px solid var(--sa-purple); color: var(--sa-purple); background: transparent; }
+        .btn-sa-outline:hover { background: var(--sa-purple-light); }
+
+        .badge-sa { background: var(--sa-purple); color: #fff; }
+        .text-sa  { color: var(--sa-purple) !important; }
+        .bg-sa    { background: var(--sa-purple) !important; }
+
+        /* Cards */
+        .sa-card { border: none; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); background: #fff; }
+        .sa-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #ede9f7;
+            font-weight: 600;
+            color: #2d1a6e;
+            border-radius: 8px 8px 0 0 !important;
+        }
+
+        /* Section border accent */
+        .accent-purple { border-left: 4px solid var(--sa-purple) !important; }
+
+        /* Tables */
+        .sa-table thead th { background: var(--sa-purple-light); color: #2d1a6e; font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid #d8cfee; }
+        .sa-table tbody tr:hover { background: #f5f3fb; }
+
+        /* Stat blocks */
+        .stat-block { border-radius: 8px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.07); padding: 1rem 1.25rem; }
+        .stat-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .6px; color: #7c6fa0; font-weight: 600; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: #2d1a6e; line-height: 1.1; }
+        .stat-sub   { font-size: .78rem; color: #9b8fc0; margin-top: 2px; }
+
+        /* Badges */
+        .badge-paid    { background: #d4edda; color: #155724; font-weight: 600; }
+        .badge-pending { background: #fff3cd; color: #856404; font-weight: 600; }
+        .badge-settled { background: var(--sa-purple-light); color: var(--sa-purple-dark); font-weight: 600; }
+
+        /* Alert overrides */
+        .alert-sa-success { background: #ede9f7; border-left: 4px solid var(--sa-purple); color: #2d1a6e; }
+        .alert-sa-error   { background: #fde8e8; border-left: 4px solid #dc3545; color: #721c24; }
+
+        /* Footer */
+        footer { font-size: .8rem; color: #9b8fc0; border-top: 1px solid #ede9f7 !important; background: #fff !important; }
+        footer a { color: var(--sa-purple-muted); text-decoration: none; }
+        footer a:hover { color: var(--sa-purple-dark); }
+
+        /* Container: use almost full width on wide screens */
+        .sa-container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 0 1.5rem; }
+    </style>
 </head>
-<body class="bg-light">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-4">
-            <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">
-                    <span class="text-primary me-1">&#128722;</span>ShopAssistant <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem;">Web</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Cashier/Index">
-                                <strong>&#128179; Cashier Portal (POS)</strong>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Admin/Index">
-                                <strong>&#128202; Admin Portal (Settlement & GL)</strong>
-                            </a>
-                        </li>
-                    </ul>
-                    <span class="navbar-text text-light small">
-                        .NET 10 &bull; POS &amp; Ledger Integration
-                    </span>
-                </div>
+<body>
+    <nav class="navbar navbar-expand-lg sa-nav py-0">
+        <div class="sa-container d-flex align-items-center" style="min-height:52px;">
+            <a class="navbar-brand me-4" asp-page="/Index">ShopAssistant</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-3" asp-page="/Index">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-3" asp-page="/Cashier/Index">Cashier POS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-3" asp-page="/Admin/Index">Admin / Settlement</a>
+                    </li>
+                </ul>
+                <span class="text-white-50 small d-none d-lg-inline">.NET 10 &bull; Double-Entry Ledger</span>
             </div>
-        </nav>
-    </header>
-    <div class="container mb-5">
+        </div>
+    </nav>
+
+    <div class="sa-container py-4">
         <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted py-3 bg-white mt-auto">
-        <div class="container d-flex justify-content-between align-items-center">
-            <span>&copy; 2026 - ShopAssistant Web - Clean Architecture Double-Entry Accounting</span>
-            <div>
-                <a class="text-decoration-none text-muted me-3" asp-area="" asp-page="/Cashier/Index">Cashier</a>
-                <a class="text-decoration-none text-muted me-3" asp-area="" asp-page="/Admin/Index">Admin</a>
-                <a class="text-decoration-none text-muted" asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="py-3 mt-2">
+        <div class="sa-container d-flex justify-content-between align-items-center">
+            <span>&copy; 2026 ShopAssistant</span>
+            <div class="d-flex gap-3">
+                <a asp-page="/Cashier/Index">Cashier</a>
+                <a asp-page="/Admin/Index">Admin</a>
+                <a asp-page="/Privacy">Privacy</a>
             </div>
         </div>
     </footer>
@@ -63,7 +121,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

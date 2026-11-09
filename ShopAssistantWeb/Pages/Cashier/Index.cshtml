@@ -1,182 +1,156 @@
 @page
 @model shopassistantweb.Pages.Cashier.IndexModel
 @{
-    ViewData["Title"] = "Cashier POS Terminal";
+    ViewData["Title"] = "Cashier POS";
 }
 
-<div class="py-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold mb-1">&#128179; Cashier Point of Sale Terminal</h1>
-            <p class="text-secondary mb-0">Record sales invoices and capture instant POS card/terminal payments.</p>
-        </div>
-        <div>
-            <span class="badge bg-light text-dark border p-2">
-                &#9989; <code>ReceivePaymentFromPOSUseCase</code> Active
-            </span>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h4 fw-bold text-sa mb-0">Cashier POS Terminal</h1>
+        <p class="text-muted small mb-0">Record sales invoices and capture instant POS payments &mdash; <code>ReceivePaymentFromPOSUseCase</code></p>
     </div>
+    <a asp-page="/Index" class="btn btn-sa-outline btn-sm">← Dashboard</a>
+</div>
 
-    @if (!string.IsNullOrEmpty(Model.StatusMessage))
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <strong>Success!</strong> @Model.StatusMessage
-            @if (!string.IsNullOrEmpty(Model.LastPaidInvoiceId))
-            {
-                <span class="badge bg-success ms-2">Receipt: @Model.LastPaidInvoiceId</span>
-            }
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-sa-success alert-dismissible fade show mb-3 py-2" role="alert">
+        @Model.StatusMessage
+        @if (!string.IsNullOrEmpty(Model.LastPaidInvoiceId))
+        {
+            <span class="ms-2 badge badge-settled">Receipt: @Model.LastPaidInvoiceId</span>
+        }
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-sa-error alert-dismissible fade show mb-3 py-2" role="alert">
+        @Model.ErrorMessage
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            <strong>Error:</strong> @Model.ErrorMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+<div class="row g-4">
+    <!-- Checkout Form -->
+    <div class="col-lg-4">
+        <div class="sa-card card">
+            <div class="card-header py-2 px-3">New Checkout</div>
+            <div class="card-body p-3">
 
-    <div class="row g-4">
-        <!-- New Sale / Checkout Panel -->
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 border-bottom">
-                    <h5 class="card-title mb-0 fw-bold">&#128722; New Customer Checkout</h5>
+                <div class="mb-3">
+                    <div class="stat-label mb-1">Quick Select</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        <button type="button" class="btn btn-sa-outline btn-sm" onclick="selectItem('Pen', 100)">Pen &#8358;100</button>
+                        <button type="button" class="btn btn-sa-outline btn-sm" onclick="selectItem('Book', 200)">Book &#8358;200</button>
+                        <button type="button" class="btn btn-sa-outline btn-sm" onclick="selectItem('Bag', 300)">Bag &#8358;300</button>
+                        <button type="button" class="btn btn-sa-outline btn-sm" onclick="selectItem('Notebook', 150)">Notebook &#8358;150</button>
+                        <button type="button" class="btn btn-sa-outline btn-sm" onclick="selectItem('Backpack', 500)">Backpack &#8358;500</button>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <!-- Quick Select Catalog Items -->
-                    <label class="form-label text-secondary small fw-bold text-uppercase">Quick Item Select</label>
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectItem('Pen', 100)">
-                            &#9999;&#65039; Pen (&#8358;100)
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectItem('Book', 200)">
-                            &#128214; Book (&#8358;200)
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectItem('Bag', 300)">
-                            &#128092; Bag (&#8358;300)
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectItem('Notebook Set', 150)">
-                            &#128221; Notebook (&#8358;150)
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectItem('School Backpack', 500)">
-                            &#127890; Backpack (&#8358;500)
-                        </button>
+
+                <form method="post">
+                    <div class="mb-2">
+                        <label asp-for="ItemName" class="form-label small fw-bold mb-1">Description</label>
+                        <input asp-for="ItemName" id="itemNameInput" class="form-control form-control-sm" placeholder="e.g. Spiral Notebook" required />
                     </div>
-
-                    <form method="post">
-                        <div class="mb-3">
-                            <label asp-for="ItemName" class="form-label fw-bold">Item / Description</label>
-                            <input asp-for="ItemName" id="itemNameInput" class="form-control" placeholder="e.g. Spiral Notebook" required />
-                        </div>
-
-                        <div class="row g-2 mb-4">
-                            <div class="col-8">
-                                <label asp-for="ItemAmount" class="form-label fw-bold">Amount</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">&#8358;</span>
-                                    <input asp-for="ItemAmount" id="itemAmountInput" type="number" step="0.01" min="1" class="form-control" required />
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label asp-for="Currency" class="form-label fw-bold">Currency</label>
-                                <select asp-for="Currency" class="form-select">
-                                    <option value="NGN" selected>NGN (&#8358;)</option>
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                </select>
+                    <div class="row g-2 mb-3">
+                        <div class="col-7">
+                            <label asp-for="ItemAmount" class="form-label small fw-bold mb-1">Amount</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">&#8358;</span>
+                                <input asp-for="ItemAmount" id="itemAmountInput" type="number" step="0.01" min="1" class="form-control" required />
                             </div>
                         </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" asp-page-handler="CreateAndPay" class="btn btn-primary btn-lg shadow-sm">
-                                &#9889; Charge &amp; Pay via POS Terminal
-                            </button>
-                            <button type="submit" asp-page-handler="CreateOnly" class="btn btn-outline-secondary btn-sm">
-                                Create Invoice Only (Unpaid)
-                            </button>
+                        <div class="col-5">
+                            <label asp-for="Currency" class="form-label small fw-bold mb-1">Currency</label>
+                            <select asp-for="Currency" class="form-select form-select-sm">
+                                <option value="NGN">NGN (&#8358;)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                            </select>
                         </div>
-                    </form>
-
-                    <div class="mt-4 p-3 bg-light rounded small text-secondary">
-                        <div class="fw-bold text-dark mb-1">&#128203; Double-Entry Effect:</div>
-                        <div>&bull; <strong>Debit:</strong> POS Receivables (Store claims payment from processor)</div>
-                        <div>&bull; <strong>Credit:</strong> Sales Revenue (Store earns income)</div>
-                        <div>&bull; <strong>Status:</strong> Invoice marked <code>IsPaid = true</code> atomically</div>
                     </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" asp-page-handler="CreateAndPay" class="btn btn-sa btn-sm">
+                            Charge &amp; Pay via POS
+                        </button>
+                        <button type="submit" asp-page-handler="CreateOnly" class="btn btn-sa-outline btn-sm">
+                            Create Invoice (Unpaid)
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-3" />
+                <div class="stat-label mb-1">Double-Entry Effect</div>
+                <div class="small text-muted lh-lg">
+                    <div>DR &nbsp;POS Receivables (Asset &uarr;)</div>
+                    <div>CR &nbsp;Sales Revenue (Revenue &uarr;)</div>
+                    <div class="text-sa fw-semibold">Invoice → IsPaid = true</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Recent Invoices List -->
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0 fw-bold">&#128220; Invoices Register</h5>
-                    <span class="badge bg-secondary">Total: @Model.Invoices.Count</span>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+    <!-- Invoice Register -->
+    <div class="col-lg-8">
+        <div class="sa-card card">
+            <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+                <span>Invoice Register</span>
+                <span class="badge badge-settled">@Model.Invoices.Count total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table sa-table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Invoices.Count == 0)
+                            {
                                 <tr>
-                                    <th>Invoice #</th>
-                                    <th>Description</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Actions</th>
+                                    <td colspan="5" class="text-center py-5 text-muted small">No invoices yet. Use the form to start a checkout.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.Invoices.Count == 0)
-                                {
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">
-                                            No invoices created yet. Start a new checkout on the left.
-                                        </td>
-                                    </tr>
-                                }
-                                @foreach (var inv in Model.Invoices)
-                                {
-                                    <tr class="@(inv.Id == Model.LastPaidInvoiceId ? "table-success" : "")">
-                                        <td class="fw-bold font-monospace">@inv.Id</td>
-                                        <td>@inv.Description</td>
-                                        <td class="fw-bold">@inv.Amount.Currency @inv.Amount.Value.ToString("N2")</td>
-                                        <td>
-                                            @if (inv.IsPaid)
-                                            {
-                                                <span class="badge bg-success">
-                                                    &#9989; Paid via POS
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-warning text-dark">
-                                                    &#9203; Pending
-                                                </span>
-                                            }
-                                        </td>
-                                        <td class="text-end">
-                                            @if (!inv.IsPaid)
-                                            {
-                                                <form method="post" asp-page-handler="PayExisting" class="d-inline">
-                                                    <input type="hidden" name="invoiceId" value="@inv.Id" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                                        Pay via POS
-                                                    </button>
-                                                </form>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted small">&#10004; Settled to POS</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                            @foreach (var inv in Model.Invoices)
+                            {
+                                <tr class="@(inv.Id == Model.LastPaidInvoiceId ? "table-active" : "")">
+                                    <td class="font-monospace fw-bold small">@inv.Id</td>
+                                    <td class="small">@inv.Description</td>
+                                    <td class="small fw-bold">@inv.Amount.Currency @inv.Amount.Value.ToString("N2")</td>
+                                    <td>
+                                        @if (inv.IsPaid)
+                                        {
+                                            <span class="badge badge-paid small">Paid</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-pending small">Pending</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (!inv.IsPaid)
+                                        {
+                                            <form method="post" asp-page-handler="PayExisting" class="d-inline">
+                                                <input type="hidden" name="invoiceId" value="@inv.Id" />
+                                                <button type="submit" class="btn btn-sa-outline btn-sm py-0 px-2">Pay</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">&#10003;</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -191,4 +165,3 @@
         }
     </script>
 }
-
